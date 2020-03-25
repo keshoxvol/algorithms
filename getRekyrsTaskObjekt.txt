@@ -1,0 +1,27 @@
+-Controller
+
+	@Autowired
+	private TaskRepo taskRepo;
+	
+	@GetMapping("/getall")
+	public List<TaskRestObj> findAllTask(){
+		Iterator<Task> iteratorTask = taskRepo.findAllByParent(0).iterator();
+		List<TaskRestObj> listTaskRest = new LinkedList<>();
+		while(iteratorTask.hasNext()) {
+			listTaskRest.add(TaskCode.taskRekurs(iteratorTask.next(), taskRepo));
+		}
+		return listTaskRest;
+	}
+	
+	
+-Method
+
+	public static TaskRestObj taskRekurs(Task task, TaskRepo taskRepo) {
+		Iterator<Task> childTasks = taskRepo.findAllByParent(task.getId()).iterator();
+		List<TaskRestObj> listTaskRest = new LinkedList<>();
+		while(childTasks.hasNext()) {
+			listTaskRest.add(taskRekurs(childTasks.next(), taskRepo));
+		}
+		return new TaskRestObj(task.getTitle(), listTaskRest);
+	}
+
